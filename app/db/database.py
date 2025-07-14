@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from typing import AsyncGenerator
-from ..config import DB_CONFIG
+from app.config import DB_CONFIG
 from urllib.parse import quote_plus
 
 encoded_password = quote_plus(DB_CONFIG.password)

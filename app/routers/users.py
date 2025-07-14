@@ -10,10 +10,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from ..db.database import get_db
-from ..config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-from ..schemas.users import TokenData, User, UserInDB, UserCreate
-from ..models.user import User as modelUser
+from app.db.database import get_db
+from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.schemas.users import TokenData, User, UserInDB, UserCreate
+from app.models.user import User as modelUser
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
