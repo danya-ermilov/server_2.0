@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
+from typing import Annotated, List
 
 import jwt
 from fastapi import Depends, APIRouter, HTTPException, status
@@ -12,7 +12,13 @@ from sqlalchemy.exc import IntegrityError
 
 from app.db.database import get_db
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-from app.schemas.users import TokenData, User, UserInDB, UserCreate
+from app.schemas.users import (
+    TokenData,
+    User,
+    UserInDB,
+    UserCreate,
+    UserUpdate
+)
 from app.models.user import User as modelUser
 
 router = APIRouter()
@@ -89,7 +95,7 @@ async def get_current_active_user(
     return current_user
 
 # ----------------------------------
-# Register new user
+# Paths
 # ----------------------------------
 
 
@@ -105,10 +111,6 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
         await db.rollback()
         raise HTTPException(status_code=400, detail="Username already exists")
 
-# ----------------------------------
-# Login and issue token
-# ----------------------------------
-
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
@@ -119,11 +121,61 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     token = create_access_token({"sub": user.username}, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": token, "token_type": "bearer"}
 
-# ----------------------------------
-# Authenticated user info
-# ----------------------------------
-
 
 @router.get("/users/me/", response_model=User)
 async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
     return current_user
+
+
+@router.get("/users/getall", response_model=List[UserInDB])
+async def get_all_users(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(modelUser))
+    users = result.scalars().all()
+    return users
+
+
+@router.get("/users/getone/{user_id}", response_model=UserInDB)
+async def get_one_users(user_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(modelUser).where(modelUser.id == user_id))
+    users = result.scalar_one_or_none()
+    return users
+
+
+@router.delete("/users/delete")
+async def delete_user(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await db.delete(user)
+    await db.commit()
+
+
+@router.put("/update", response_model=UserInDB)
+async def update_user(
+    payload: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if payload.username:
+        user.username = payload.username
+    if payload.password:
+        user.password_hash = get_password_hash(payload.password)
+    if payload.role:
+        user.role = payload.role
+
+    await db.commit()
+    await db.refresh(user)
+
+    return user

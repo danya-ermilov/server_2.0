@@ -3,7 +3,7 @@ import asyncpg
 from typing import Annotated, AsyncGenerator
 from fastapi import Header, HTTPException
 
-from config import DB_CONFIG
+from app.config import DB_CONFIG
 
 
 async def get_token_header(x_token: Annotated[str, Header()]):

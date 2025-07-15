@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 # from .dependencies import get_query_token, get_token_header
 # from .internal import admin
-from routers import users
+from app.routers import users
 
 app = FastAPI()
 
