@@ -122,7 +122,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     return {"access_token": token, "token_type": "bearer"}
 
 
-@router.get("/users/me/", response_model=User)
+@router.get("/users/me", response_model=User)
 async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
     return current_user
 
@@ -134,48 +134,56 @@ async def get_all_users(db: AsyncSession = Depends(get_db)):
     return users
 
 
-@router.get("/users/getone/{user_id}", response_model=UserInDB)
-async def get_one_users(user_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(modelUser).where(modelUser.id == user_id))
+@router.get("/users/getone/{username}", response_model=UserInDB)
+async def get_one_users(username: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(modelUser).where(modelUser.username == username))
     users = result.scalar_one_or_none()
     return users
 
 
-@router.delete("/users/delete")
+@router.delete("/users/delete/{username}")
 async def delete_user(
+    username: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
-    user = result.scalar_one_or_none()
+    if current_user.username == username or current_user.role == 'admin':
+        result = await db.execute(select(modelUser).where(modelUser.username == username))
+        user = result.scalar_one_or_none()
 
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    await db.delete(user)
-    await db.commit()
+        await db.delete(user)
+        await db.commit()
+    else:
+        HTTPException(status_code=404, detail='Access denied')
 
 
-@router.put("/update", response_model=UserInDB)
+@router.put("/update/{username}", response_model=UserInDB)
 async def update_user(
+    username: str,
     payload: UserUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
-    user = result.scalar_one_or_none()
+    if current_user.username == username or current_user.role == 'admin':
+        result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
+        user = result.scalar_one_or_none()
 
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    if payload.username:
-        user.username = payload.username
-    if payload.password:
-        user.password_hash = get_password_hash(payload.password)
-    if payload.role:
-        user.role = payload.role
+        if payload.username:
+            user.username = payload.username
+        if payload.password:
+            user.password_hash = get_password_hash(payload.password)
+        if payload.role:
+            user.role = payload.role
 
-    await db.commit()
-    await db.refresh(user)
+        await db.commit()
+        await db.refresh(user)
 
-    return user
+        return user
+    else:
+        HTTPException(status_code=404, detail='Access denied')
