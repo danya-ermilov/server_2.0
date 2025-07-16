@@ -3,7 +3,6 @@ from typing import Optional
 
 
 class UserBase(BaseModel):
-    id: int
     username: str
 
 
@@ -12,6 +11,7 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
+    id: int
     disabled: bool = False
     role: str = 'user'
 
