@@ -21,7 +21,6 @@ def get_url():
 
 
 def run_migrations_offline():
-    """Миграции в offline-режиме (без подключения к БД)"""
     url = get_url()
     context.configure(
         url=url,
@@ -35,7 +34,6 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """Миграции в online-режиме (подключение к БД)"""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix='sqlalchemy.',

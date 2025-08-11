@@ -27,9 +27,9 @@ class UserInDB(User):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str]
-    password: Optional[str]
-    role: Optional[str]
+    username: Optional[str]= None
+    password: Optional[str] = None
+    role: Optional[str]= None
     disabled: bool = False
 
     class Config:
