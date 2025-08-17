@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from app.db.database import Base
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
+
+from app.db.database import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -12,3 +14,4 @@ class User(Base):
     role = Column(String, default='user')
 
     products = relationship("Product", back_populates="owner", cascade="all, delete")
+    cart_items = relationship("CartItem", back_populates="user", cascade="all, delete")

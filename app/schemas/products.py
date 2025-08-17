@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
+
 
 class ProductBase(BaseModel):
     name: str
@@ -15,6 +17,14 @@ class ProductUpdate(BaseModel):
 class ProductOut(ProductBase):
     id: int
     owner_id: int
+
+    class Config:
+        orm_mode = True
+
+# ---------- Cart ----------
+class CartItemOut(BaseModel):
+    id: int
+    product: ProductOut
 
     class Config:
         orm_mode = True

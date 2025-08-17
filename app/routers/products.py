@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from app.db.database import get_db
-from app.schemas.products import ProductCreate, ProductOut, ProductUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.crud import products as crud_product
-from app.routers.users import get_current_user
+from app.db.database import get_db
 from app.models.user import User
+from app.routers.users import get_current_user
+from app.schemas.products import ProductCreate, ProductOut, ProductUpdate
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -18,12 +19,18 @@ async def create_product(
 ):
     return await crud_product.create_product(db, product_in, current_user.id)
 
-@router.get("/", response_model=List[ProductOut])
+@router.get("/my_products", response_model=List[ProductOut])
 async def get_my_products(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     return await crud_product.get_products_by_user(db, current_user.id)
+
+@router.get("/", response_model=list[ProductOut])
+async def list_all_products(
+    db: AsyncSession = Depends(get_db)
+):
+    return await crud_product.get_all_products(db)
 
 @router.get("/{product_id}", response_model=ProductOut)
 async def get_product(

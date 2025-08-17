@@ -1,7 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.product import Product
 from app.schemas.products import ProductCreate, ProductUpdate
+
 
 async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: int):
     product = Product(**product_in.dict(), owner_id=user_id)
@@ -9,6 +11,10 @@ async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: i
     await db.commit()
     await db.refresh(product)
     return product
+
+async def get_all_products(db: AsyncSession):
+    result = await db.execute(select(Product))
+    return result.scalars().all()
 
 async def get_product(db: AsyncSession, product_id: int):
     result = await db.execute(select(Product).where(Product.id == product_id))

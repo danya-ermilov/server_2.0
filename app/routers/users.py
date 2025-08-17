@@ -2,24 +2,18 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, List
 
 import jwt
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from app.db.database import get_db
-from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-from app.schemas.users import (
-    TokenData,
-    User,
-    UserInDB,
-    UserCreate,
-    UserUpdate
-)
 from app.models.user import User as modelUser
+from app.schemas.users import TokenData, User, UserCreate, UserInDB, UserUpdate
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -135,55 +129,48 @@ async def get_all_users(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/users/getone/{username}", response_model=UserInDB)
-async def get_one_users(username: int, db: AsyncSession = Depends(get_db)):
+async def get_one_users(username: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(modelUser).where(modelUser.username == username))
     users = result.scalar_one_or_none()
     return users
 
 
-@router.delete("/users/delete/{username}")
+@router.delete("/users/delete/")
 async def delete_user(
-    username: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    if current_user.username == username or current_user.role == 'admin':
-        result = await db.execute(select(modelUser).where(modelUser.username == username))
-        user = result.scalar_one_or_none()
+    result = await db.execute(select(modelUser).where(modelUser.username == current_user.username))
+    user = result.scalar_one_or_none()
 
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        await db.delete(user)
-        await db.commit()
-    else:
-        HTTPException(status_code=404, detail='Access denied')
+    await db.delete(user)
+    await db.commit()
 
 
-@router.put("/update/{username}", response_model=UserInDB)
+
+@router.put("/update/", response_model=UserInDB)
 async def update_user(
-    username: str,
     payload: UserUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    if current_user.username == username or current_user.role == 'admin':
-        result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
-        user = result.scalar_one_or_none()
+    result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
+    user = result.scalar_one_or_none()
 
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        if payload.username:
-            user.username = payload.username
-        if payload.password:
-            user.password_hash = get_password_hash(payload.password)
-        if payload.role:
-            user.role = payload.role
+    if payload.username:
+        user.username = payload.username
+    if payload.password:
+        user.password_hash = get_password_hash(payload.password)
+    if payload.role:
+        user.role = payload.role
 
-        await db.commit()
-        await db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
 
-        return user
-    else:
-        HTTPException(status_code=404, detail='Access denied')
+    return user
