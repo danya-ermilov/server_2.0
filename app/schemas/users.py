@@ -14,7 +14,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     disabled: bool = False
-    role: str = 'user'
+    role: str = "user"
 
     class Config:
         from_attributes = True
@@ -28,9 +28,9 @@ class UserInDB(User):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str]= None
+    username: Optional[str] = None
     password: Optional[str] = None
-    role: Optional[str]= None
+    role: Optional[str] = None
     disabled: bool = False
 
     class Config:

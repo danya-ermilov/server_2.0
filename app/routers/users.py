@@ -31,6 +31,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
+
 # ----------------------------------
 # Get user by username (ORM)
 # ----------------------------------
@@ -39,6 +40,7 @@ def get_password_hash(password: str) -> str:
 async def get_user(db: AsyncSession, username: str) -> modelUser | None:
     result = await db.execute(select(modelUser).where(modelUser.username == username))
     return result.scalar_one_or_none()
+
 
 # ----------------------------------
 # Create JWT token
@@ -51,14 +53,14 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 # ----------------------------------
 # Auth dependencies
 # ----------------------------------
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: AsyncSession = Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)
 ) -> UserInDB:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -88,6 +90,7 @@ async def get_current_active_user(
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
+
 # ----------------------------------
 # Paths
 # ----------------------------------
@@ -107,17 +110,23 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
+):
     user = await get_user(db, form_data.username)
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_access_token({"sub": user.username}, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    token = create_access_token(
+        {"sub": user.username}, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     return {"access_token": token, "token_type": "bearer"}
 
 
 @router.get("/users/me", response_model=User)
-async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
     return current_user
 
 
@@ -138,9 +147,11 @@ async def get_one_users(username: str, db: AsyncSession = Depends(get_db)):
 @router.delete("/users/delete/")
 async def delete_user(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(modelUser).where(modelUser.username == current_user.username))
+    result = await db.execute(
+        select(modelUser).where(modelUser.username == current_user.username)
+    )
     user = result.scalar_one_or_none()
 
     if user is None:
@@ -150,12 +161,11 @@ async def delete_user(
     await db.commit()
 
 
-
 @router.put("/update/", response_model=UserInDB)
 async def update_user(
     payload: UserUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     result = await db.execute(select(modelUser).where(modelUser.id == current_user.id))
     user = result.scalar_one_or_none()

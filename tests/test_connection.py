@@ -1,5 +1,6 @@
-import pytest
 import asyncpg
+import pytest
+
 from app.config import DB_CONFIG
 
 

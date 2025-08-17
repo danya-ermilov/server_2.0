@@ -10,7 +10,6 @@ app.include_router(products.router)
 app.include_router(carts.router)
 
 
-
 @app.get("/")
 async def root():
     return {"message": "Hello Bigger Applications!"}

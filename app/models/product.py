@@ -13,4 +13,6 @@ class Product(Base):
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
     owner = relationship("User", back_populates="products")
-    cart_items = relationship("CartItem", back_populates="product", cascade="all, delete")
+    cart_items = relationship(
+        "CartItem", back_populates="product", cascade="all, delete"
+    )

@@ -1,7 +1,10 @@
 import json
+from typing import Dict, List
+
 import redis.asyncio as aioredis
-from typing import List, Dict
+
 from app.config import REDIS_CONFIG
+
 
 class RedisCartCache:
     def __init__(self):
@@ -23,5 +26,6 @@ class RedisCartCache:
 
     async def clear_cache(self, user_id: int):
         await self.redis.delete(f"cart:{user_id}")
+
 
 cart_cache = RedisCartCache()
