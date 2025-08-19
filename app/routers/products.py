@@ -3,10 +3,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.dependencies import get_current_user
 from app.crud import products as crud_product
 from app.db.database import get_db
 from app.models.user import User
-from app.routers.users import get_current_user
 from app.schemas.products import ProductCreate, ProductOut, ProductUpdate
 
 router = APIRouter(prefix="/products", tags=["Products"])
@@ -28,7 +28,7 @@ async def get_my_products(
     return await crud_product.get_products_by_user(db, current_user.id)
 
 
-@router.get("/", response_model=list[ProductOut])
+@router.get("/", response_model=List[ProductOut])
 async def list_all_products(db: AsyncSession = Depends(get_db)):
     return await crud_product.get_all_products(db)
 
@@ -55,7 +55,7 @@ async def update_product(
     current_user: User = Depends(get_current_user),
 ):
     product = await crud_product.update_product(
-        db, product_id, product_in, current_user.id
+        db, product_id, product_in, current_user
     )
     if not product:
         raise HTTPException(
@@ -71,10 +71,10 @@ async def delete_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    deleted = await crud_product.delete_product(db, product_id, current_user.id)
+    deleted = await crud_product.delete_product(db, product_id, current_user)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found or not yours",
         )
-    return {"message": "Product deleted successfully"}
+    return {"message": f"Product-{product_id} deleted successfully"}

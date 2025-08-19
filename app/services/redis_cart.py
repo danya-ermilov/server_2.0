@@ -22,7 +22,7 @@ class RedisCartCache:
         return json.loads(data) if data else None
 
     async def set_cached_cart(self, user_id: int, cart: List[Dict]):
-        await self.redis.set(f"cart:{user_id}", json.dumps(cart), ex=300)  # 5 минут TTL
+        await self.redis.set(f"cart:{user_id}", json.dumps(cart), ex=300)
 
     async def clear_cache(self, user_id: int):
         await self.redis.delete(f"cart:{user_id}")
