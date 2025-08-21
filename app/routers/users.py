@@ -67,7 +67,7 @@ async def delete_user(
     return {"message": "User deleted"}
 
 
-@router.put("/update/", response_model=UserInDB)
+@router.put("/users/update/", response_model=UserInDB)
 async def update_user(
     payload: UserUpdate,
     db: AsyncSession = Depends(get_db),

@@ -4,7 +4,7 @@ import pytest
 from app.config import DB_CONFIG
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_db_connection():
     conn = await asyncpg.connect(
         user=DB_CONFIG.user,
