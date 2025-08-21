@@ -1,8 +1,8 @@
 from typing import AsyncGenerator
 from urllib.parse import quote_plus
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import DB_CONFIG
 
@@ -13,8 +13,13 @@ DATABASE_URL = f"postgresql+asyncpg://{DB_CONFIG.user}:{encoded_password}@{DB_CO
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
-async_session = async_sessionmaker(engine, expire_on_commit=False)
-
+async_session = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 Base = declarative_base()
 
 

@@ -20,7 +20,7 @@ async def get_all_products(db: AsyncSession):
     return result.scalars().all()
 
 
-async def get_product(db: AsyncSession, product_id: int):
+async def get_product(db: AsyncSession, product_id: int) -> Product | None:
     result = await db.execute(select(Product).where(Product.id == product_id))
     return result.scalar_one_or_none()
 
@@ -37,7 +37,7 @@ async def update_product(
     if not product:
         return None
 
-    if product.owner_id != user.id or user.role != "admin":
+    if product.owner_id != user.id and user.role != "admin":
         return None
 
     for field, value in product_in.model_dump(exclude_unset=True).items():
@@ -52,7 +52,7 @@ async def delete_product(db: AsyncSession, product_id: int, user: User):
     if not product:
         return False
 
-    if product.owner_id != user.id or user.role != "admin":
+    if product.owner_id != user.id and user.role != "admin":
         return False
 
     await db.delete(product)
