@@ -2,7 +2,6 @@ import uuid
 import pytest
 from httpx import AsyncClient
 from typing import Dict
-from app.main import app
 
 
 async def _register_and_get_token(
