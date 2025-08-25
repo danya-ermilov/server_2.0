@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Комментарии WebSocket</title>
+  </head>
+  <body>
+    <h1>Комментарии в реальном времени</h1>
+    <label>
+      ID товара:
+      <input type="number" id="productIdInput" value="1" min="1" />
+    </label>
+    <button id="connectBtn">Подключиться</button>
+
+    <ul id="commentsList"></ul>
+
+    <script>
+      let ws = null;
+
+      document.getElementById("connectBtn").onclick = function () {
+        const productId = document.getElementById("productIdInput").value;
+        if (!productId) return alert("Введите ID товара!");
+        if (ws) ws.close();
+
+        const wsUrl = `ws://${location.host}/comments-ws/ws/comments/${productId}`;
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          console.log("WebSocket подключён:", wsUrl);
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const comment = JSON.parse(event.data);
+            const li = document.createElement("li");
+            li.textContent = `[${comment.created_at ?? ""}] (${comment.author ?? "u"}) ${comment.text}`;
+            document.getElementById("commentsList").appendChild(li);
+          } catch (err) {
+            console.error("Ошибка парсинга сообщения:", err, event.data);
+          }
+        };
+
+        ws.onclose = () => {
+          console.log("WebSocket закрыт");
+        };
+
+        ws.onerror = (err) => {
+          console.error("Ошибка WebSocket:", err);
+        };
+      };
+    </script>
+  </body>
+</html>

@@ -16,3 +16,6 @@ class Product(Base):
     cart_items = relationship(
         "CartItem", back_populates="product", cascade="all, delete"
     )
+    comments = relationship(
+        "Comment", back_populates="product", cascade="all, delete-orphan"
+    )

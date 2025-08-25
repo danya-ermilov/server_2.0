@@ -15,3 +15,4 @@ class User(Base):
 
     products = relationship("Product", back_populates="owner", cascade="all, delete")
     cart_items = relationship("CartItem", back_populates="user", cascade="all, delete")
+    comments = relationship("Comment", back_populates="author", cascade="all, delete")

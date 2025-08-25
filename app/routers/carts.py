@@ -5,14 +5,17 @@ from app.auth.dependencies import get_current_user
 from app.crud import carts, products
 from app.db.database import get_db
 from app.schemas.users import User
-from app.services.redis_cart import cart_cache
+from app.services.redis_cart import RedisCartCache
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
+
+cart_cache = None
 
 
 @router.on_event("startup")
 async def startup():
-    await cart_cache.connect()
+    global cart_cache
+    cart_cache = await RedisCartCache.create()
 
 
 @router.get("/")
@@ -47,10 +50,13 @@ async def add_to_cart(
     product = await products.get_product(db, item_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-
-    await carts.add_cart_item(db, user_id, item_id)
-    await cart_cache.clear_cache(user_id)
-    return {"status": "added"}
+    cart = (i.product_id for i in await carts.get_cart_items(db, user_id))
+    if item_id not in cart:
+        await carts.add_cart_item(db, user_id, item_id)
+        await cart_cache.clear_cache(user_id)
+        return {"status": "added"}
+    else:
+        return "already in cart"
 
 
 @router.delete("/")
