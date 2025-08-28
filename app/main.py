@@ -13,6 +13,7 @@ async def startup_event():
     await init_redis()
     await init_cache()
     from app.routers.comments_ws import redis_listener
+
     asyncio.create_task(redis_listener())
 
 

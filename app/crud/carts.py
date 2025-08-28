@@ -5,6 +5,7 @@ from app.models.cart import CartItem
 from app.crud import products as crud_product
 from app.core.cache import get_cache
 
+
 async def get_cart_items(db: AsyncSession, user_id: int):
     result = await db.execute(select(CartItem).filter(CartItem.user_id == user_id))
     return result.scalars().all()

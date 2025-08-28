@@ -5,7 +5,7 @@ from app.auth.dependencies import get_current_user
 from app.crud import carts as crud_cart, products as crud_product
 from app.db.database import get_db
 from app.schemas.users import User
-from app.core.cache import get_cache 
+from app.core.cache import get_cache
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
