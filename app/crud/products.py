@@ -81,9 +81,8 @@ async def delete_product(db: AsyncSession, product_id: int, user: User):
 
 
 async def search_products(db: AsyncSession, query: str):
-    stmt = (
-        select(Product)
-        .where(Product.search_vector.op("@@")(func.plainto_tsquery("simple", query)))
+    stmt = select(Product).where(
+        Product.search_vector.op("@@")(func.plainto_tsquery("simple", query))
     )
     result = await db.execute(stmt)
     return result.scalars().all()
