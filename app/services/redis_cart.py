@@ -32,3 +32,18 @@ class RedisCartCache:
 
     async def clear_cache(self, user_id: int):
         await self.redis.delete(f"cart:{user_id}")
+
+    async def incr_cart_count(self, product_id: int):
+        await self.redis.incr(f"cart_count:{product_id}")
+
+    async def decr_cart_count(self, product_id: int):
+        await self.redis.decr(f"cart_count:{product_id}")
+
+    async def get_cart_count(self, product_id: int, default: int = 0) -> int:
+        value = await self.redis.get(f"cart_count:{product_id}")
+        if value is None:
+            return default
+        return int(value)
+
+    async def set_cart_count(self, product_id: int, count: int):
+        await self.redis.set(f"cart_count:{product_id}", count)

@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.core.cache import get_cache
 from app.models.product import Product
 from app.schemas.products import ProductCreate, ProductUpdate
 
@@ -22,7 +22,14 @@ async def get_all_products(db: AsyncSession):
 
 async def get_product(db: AsyncSession, product_id: int) -> Product | None:
     result = await db.execute(select(Product).where(Product.id == product_id))
-    return result.scalar_one_or_none()
+    result = result.scalar_one_or_none()
+    count = await get_cache().get_cart_count(product_id)
+    if not count:
+        count = result.cart_count
+        await get_cache().set_cart_count(product_id, count)
+
+    result.cart_count = count
+    return result
 
 
 async def get_products_by_user(db: AsyncSession, user_id: int):

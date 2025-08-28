@@ -11,6 +11,7 @@ class Product(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    cart_count = Column(Integer, default=0)
 
     owner = relationship("User", back_populates="products")
     cart_items = relationship(

@@ -16,7 +16,7 @@ async def init_redis():
 
 async def get_redis():
     if not _redis:
-        raise RuntimeError("Redis не инициализирован, вызови init_redis() в startup")
+        raise RuntimeError("Redis not initialized")
     return _redis
 
 

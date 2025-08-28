@@ -20,6 +20,7 @@ class ProductUpdate(BaseModel):
 class ProductOut(ProductBase):
     id: int
     owner_id: int
+    cart_count: int
 
     class Config:
         orm_mode = True
