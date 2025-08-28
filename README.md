@@ -20,6 +20,7 @@
 ├── crud/ # CRUD-операции
 │ ├── carts.py
 │ ├── comments.py
+│ ├── tags.py
 │ ├── products.py
 │ └── users.py
 │
@@ -30,6 +31,7 @@
 ├── models/ # SQLAlchemy модели
 │ ├── cart.py
 │ ├── comment.py
+│ ├── tag.py
 │ ├── product.py
 │ └── user.py
 │
@@ -38,6 +40,7 @@
 │ ├── carts.py
 │ ├── comments.py
 │ ├── comments_ws.py # WebSocket для комментариев
+│ ├── tags.py
 │ ├── products.py
 │ └── users.py
 │
