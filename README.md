@@ -79,7 +79,7 @@
 
 ### 1. Клонировать репозиторий
 ```bash
-git clone https://github.com/danyaiermilov/server_2.0.git
+git clone https://github.com/danya-ermilov/server_2.0.git
 cd server_2.0
 ```
 ### 2. Создать виртуальное окружение и установить зависимости
@@ -90,7 +90,7 @@ venv\Scripts\activate     # Windows
 
 pip install -r requirements.txt
 ```
-### 3. Настроить переменные окружения, настроить миграции, заупстить сервер
+### 3. Настроить переменные окружения, настроить миграции, запустить сервер
 (см Wiki)
 
 
