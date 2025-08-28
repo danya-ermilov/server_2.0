@@ -40,6 +40,13 @@ async def list_all_products(
 ):
     return await crud_product.get_all_products(db, tag)
 
+@router.get("/search", response_model=list[ProductOut])
+async def search_products(
+    q: str = Query(..., min_length=2, description="Search by product name/description"),
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud_product.search_products(db, q)
+
 
 @router.get("/{product_id}", response_model=ProductOut)
 async def get_product(

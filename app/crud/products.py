@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.cache import get_cache
 from app.models.product import Product
@@ -78,3 +78,12 @@ async def delete_product(db: AsyncSession, product_id: int, user: User):
     await db.delete(product)
     await db.commit()
     return True
+
+
+async def search_products(db: AsyncSession, query: str):
+    stmt = (
+        select(Product)
+        .where(Product.search_vector.op("@@")(func.plainto_tsquery("simple", query)))
+    )
+    result = await db.execute(stmt)
+    return result.scalars().all()
