@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user
@@ -18,7 +18,13 @@ async def create_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return await crud_product.create_product(db, product_in, current_user.id)
+    res = await crud_product.create_product(db, product_in, current_user.id)
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="tag not found",
+        )
+    return res
 
 
 @router.get("/my_products", response_model=List[ProductOut])
@@ -29,8 +35,10 @@ async def get_my_products(
 
 
 @router.get("/", response_model=List[ProductOut])
-async def list_all_products(db: AsyncSession = Depends(get_db)):
-    return await crud_product.get_all_products(db)
+async def list_all_products(
+    tag: List[str] = Query(None), db: AsyncSession = Depends(get_db)
+):
+    return await crud_product.get_all_products(db, tag)
 
 
 @router.get("/{product_id}", response_model=ProductOut)

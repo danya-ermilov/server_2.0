@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
+    tag_name: str
 
 
 class ProductCreate(ProductBase):
@@ -15,6 +16,7 @@ class ProductCreate(ProductBase):
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    tag_name: Optional[str] = None
 
 
 class ProductOut(ProductBase):

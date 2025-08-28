@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import asyncio
-from app.routers import admins, carts, products, users, comments, comments_ws
+from app.routers import admins, carts, products, users, comments, comments_ws, tags
 from app.db.redis import init_redis
 from fastapi.staticfiles import StaticFiles
 from app.core.cache import init_cache
@@ -26,6 +26,7 @@ app.include_router(carts.router)
 app.include_router(admins.router)
 app.include_router(comments.router)
 app.include_router(comments_ws.router)
+app.include_router(tags.router)
 
 
 @app.get("/")

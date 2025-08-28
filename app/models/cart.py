@@ -1,7 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
-from sqlalchemy.orm import relationship
-
 from app.db.database import Base
+from sqlalchemy.orm import relationship
 
 
 class CartItem(Base):
