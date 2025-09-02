@@ -2,6 +2,8 @@ import os
 import sys
 from logging.config import fileConfig
 
+from app.config import DB_CONFIG
+
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
@@ -16,6 +18,11 @@ config = context.config
 fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+
+config.set_main_option(
+    "sqlalchemy.url",
+    f"postgresql+psycopg2://{DB_CONFIG.user}:{DB_CONFIG.password}@{DB_CONFIG.host}:{DB_CONFIG.port}/{DB_CONFIG.database}"
+)
 
 
 def get_url():

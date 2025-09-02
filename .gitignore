@@ -1,5 +1,6 @@
 venv/
-config.py
+.env.dev
+.env.docker
 example.py
 .vscode
 alembic.ini
