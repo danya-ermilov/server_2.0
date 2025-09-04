@@ -15,6 +15,7 @@
 │ └── jwt_handler.py
 │
 ├── core/ # Ядро: кэш и утилиты
+│ ├── config.py
 │ └── cache.py
 │
 ├── crud/ # CRUD-операции
