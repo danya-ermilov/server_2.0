@@ -4,12 +4,8 @@ from urllib.parse import quote_plus
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from app.config import DB_CONFIG
+from app.core.config import DATABASE_URL
 
-encoded_password = quote_plus(DB_CONFIG.password)
-
-
-DATABASE_URL = f"postgresql+asyncpg://{DB_CONFIG.user}:{encoded_password}@{DB_CONFIG.host}/{DB_CONFIG.database}"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 

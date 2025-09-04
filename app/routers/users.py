@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import get_current_active_user
 from app.auth.hashing import verify_password
 from app.auth.jwt_handler import create_access_token
-from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.config import settings
 from app.crud import users as crud_user
 from app.db.database import get_db
 from app.models.user import User as modelUser
@@ -36,7 +36,7 @@ async def login(
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token(
-        {"sub": user.username}, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        {"sub": user.username}, timedelta(minutes=settings.access_token_expire_minutes)
     )
     return {"access_token": token, "token_type": "bearer"}
 

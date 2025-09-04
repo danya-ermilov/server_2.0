@@ -3,7 +3,6 @@ venv/
 .env.docker
 example.py
 .vscode
-alembic.ini
 
 # Distribution / packaging
 .Python

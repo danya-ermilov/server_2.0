@@ -1,8 +1,6 @@
 import redis.asyncio as aioredis
-from app.config import REDIS_CONFIG
+from app.core.config import REDIS_URL
 
-
-REDIS_URL = f"redis://{REDIS_CONFIG.redis_host}:{REDIS_CONFIG.redis_port}/{REDIS_CONFIG.redis_db}"
 
 _redis: aioredis.Redis | None = None
 

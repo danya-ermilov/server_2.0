@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import tags as crud_tag
 from app.db.database import get_db
-from app.schemas.users import UserUpdate
 
 
 router = APIRouter(prefix="/tags", tags=["Tags"])

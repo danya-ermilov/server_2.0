@@ -2,7 +2,7 @@ import json
 from typing import Dict, List
 
 import redis.asyncio as aioredis
-from app.config import REDIS_CONFIG
+from app.core.config import REDIS_URL
 
 from app.db.redis import get_redis
 
@@ -19,7 +19,7 @@ class RedisCartCache:
     async def connect(self):
         if not self.redis:
             self.redis = await aioredis.from_url(
-                f"redis://{REDIS_CONFIG.redis_host}:{REDIS_CONFIG.redis_port}/{REDIS_CONFIG.redis_db}",
+                REDIS_URL,
                 decode_responses=True,
             )
 

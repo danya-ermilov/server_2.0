@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import ALGORITHM, SECRET_KEY
+from app.core.config import settings
 from app.crud.users import get_user
 from app.db.database import get_db
 from app.schemas.users import TokenData, User, UserInDB
@@ -23,7 +23,9 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         username: str = payload.get("sub")
         if not username:
             raise credentials_exception
