@@ -15,6 +15,8 @@ from app.db.database import get_db
 from app.models.user import User as modelUser
 from app.schemas.users import User, UserCreate, UserInDB, UserUpdate
 
+from app.auth.dependencies import get_current_user
+
 router = APIRouter()
 
 
@@ -58,6 +60,12 @@ async def get_one_user(username: str, db: AsyncSession = Depends(get_db)):
     return user
 
 
+@router.get("/users/getone/{username}/xp")
+async def get_one_user_with_xp(username: str, db: AsyncSession = Depends(get_db)):
+    user = await crud_user.get_user_with_xp(db, username)
+    return user
+
+
 @router.delete("/users/delete/")
 async def delete_user(
     db: AsyncSession = Depends(get_db),
@@ -74,3 +82,39 @@ async def update_user(
     current_user: User = Depends(get_current_active_user),
 ):
     return await crud_user.update_user(db, current_user.username, payload)
+
+
+@router.post("/users/{username}/set_xp")
+async def set_user_xp(
+    username: str,
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    xp_record = await crud_user.set_user_xp(
+        db=db,
+        username=username,
+        product_id=product_id,
+        current_user=current_user,
+    )
+
+    stats = await crud_user.get_user_stat(db, username)
+
+    return {
+        "message": "XP успешно начислены",
+        "user": {
+            "username": username,
+        },
+        "xp_record": {
+            "product_id": xp_record.product_id,
+            "category": xp_record.category,
+            "points": xp_record.points,
+            "created_at": xp_record.created_at,
+        },
+        "updated_stats": {
+            "total_xp": stats.total_xp,
+            "skill_mind": stats.skill_mind,
+            "skill_social": stats.skill_social,
+            "skill_sport": stats.skill_sport,
+        },
+    }

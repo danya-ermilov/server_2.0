@@ -7,6 +7,7 @@ class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
     tag_name: str
+    xp: int
 
 
 class ProductCreate(ProductBase):
@@ -17,6 +18,7 @@ class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     tag_name: Optional[str] = None
+    xp: Optional[int] = None
 
 
 class ProductOut(ProductBase):

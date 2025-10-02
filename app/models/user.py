@@ -12,6 +12,16 @@ class User(Base):
     disabled = Column(Boolean, default=False)
     role = Column(String, default="user")
 
+    xp_records = relationship(
+        "XpHistory", back_populates="user", cascade="all, delete", lazy="selectin"
+    )
+    stats = relationship(
+        "UserStat",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete",
+        lazy="selectin",
+    )
     products = relationship("Product", back_populates="owner", cascade="all, delete")
     cart_items = relationship("CartItem", back_populates="user", cascade="all, delete")
     comments = relationship("Comment", back_populates="author", cascade="all, delete")

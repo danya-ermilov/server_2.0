@@ -1,8 +1,51 @@
-from typing import Optional
-
+from typing import Optional, List
+from datetime import datetime
 from pydantic import BaseModel
 
 
+# -------------------------
+# Агрегаты XP пользователя
+# -------------------------
+class UserStatBase(BaseModel):
+    total_xp: int = 0
+    skill_mind: int = 0
+    skill_social: int = 0
+    skill_sport: int = 0
+
+
+class UserStat(UserStatBase):
+    id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -------------------------
+# История начислений XP
+# -------------------------
+class XpHistoryBase(BaseModel):
+    category: str  # mind, social, sport, total
+    points: int
+    product_id: int  # если связано с мероприятием
+
+
+class XpHistoryCreate(XpHistoryBase):
+    user_id: int  # нужно при создании записи
+
+
+class XpHistory(XpHistoryBase):
+    id: int
+    user_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# -------------------------
+# Пользователь
+# -------------------------
 class UserBase(BaseModel):
     username: str
 
@@ -15,6 +58,8 @@ class User(UserBase):
     id: int
     disabled: bool = False
     role: str = "user"
+    stats: Optional[UserStat] = None
+    xp_records: Optional[List[XpHistory]] = []
 
     class Config:
         from_attributes = True
@@ -37,5 +82,8 @@ class UserUpdate(BaseModel):
         from_attributes = True
 
 
+# -------------------------
+# Токен
+# -------------------------
 class TokenData(BaseModel):
-    username: str | None = None
+    username: Optional[str] = None

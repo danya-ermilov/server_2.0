@@ -8,7 +8,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.db.database import Base
-from app.models import cart, product, user, comment, tag
+from app.models import cart, product, user, comment, tag, user_stat, xp_history
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -19,10 +19,8 @@ fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
 
-config.set_main_option(
-    "sqlalchemy.url",
-    DATABASE_URL
-)
+SYNC_DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
+config.set_main_option("sqlalchemy.url", SYNC_DATABASE_URL)
 
 
 def get_url():

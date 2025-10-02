@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from urllib.parse import quote_plus
 
 
 class Settings(BaseSettings):
@@ -29,7 +28,7 @@ settings = Settings()
 
 DATABASE_URL = (
     f"postgresql+asyncpg://{settings.postgres_user}:"
-    f"{quote_plus(settings.postgres_password)}@{settings.postgres_host}:"
+    f"{settings.postgres_password}@{settings.postgres_host}:"
     f"{settings.postgres_port}/{settings.postgres_db}"
 )
 

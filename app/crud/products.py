@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.cache import get_cache
@@ -42,6 +43,8 @@ async def get_product(db: AsyncSession, product_id: int) -> Product | None:
             await get_cache().set_cart_count(product_id, count)
 
         result.cart_count = count
+    else:
+        raise HTTPException(status_code=404, detail="Product not found")
     return result
 
 
