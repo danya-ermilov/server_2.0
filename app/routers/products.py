@@ -36,9 +36,11 @@ async def get_my_products(
 
 @router.get("/", response_model=List[ProductOut])
 async def list_all_products(
-    tag: List[str] = Query(None), db: AsyncSession = Depends(get_db)
+    tag: str = Query(None, enum=["skill_mind", "skill_sport", "skill_social", "skill_game"]),
+    db: AsyncSession = Depends(get_db),
+    sort_by: str = Query("life_time", enum=["life_time", "total_xp"])
 ):
-    return await crud_product.get_all_products(db, tag)
+    return await crud_product.get_all_products(db, tag, sort_by)
 
 
 @router.get("/search", response_model=list[ProductOut])

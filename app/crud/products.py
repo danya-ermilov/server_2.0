@@ -6,9 +6,11 @@ from app.models.product import Product
 from app.schemas.products import ProductCreate, ProductUpdate
 from app.crud import tags as crud_tag
 from app.models.user import User
-from typing import Optional, List
+from app.models.user_stat import UserStat
+from typing import Optional
 from app.models.cart import CartItem
 from datetime import datetime, timedelta
+from sqlalchemy.orm import aliased
 
 
 async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: int):
@@ -24,11 +26,23 @@ async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: i
     return product
 
 
-async def get_all_products(db: AsyncSession, tag: Optional[List[str]]):
+async def get_all_products(db: AsyncSession, tag: Optional[str], sort_by: str):
     query = select(Product).where(Product.life_time > (datetime.utcnow() + timedelta(hours=3))) # Только для МСК
 
+    user_stat_alias = aliased(UserStat)
+
+    if sort_by == "total_xp":
+        query = (
+            query
+            .join(Product.owner)
+            .outerjoin(user_stat_alias, Product.owner.has(User.stats))
+            .order_by(func.coalesce(user_stat_alias.total_xp, 0).desc())
+        )
+    else:
+        query = query.order_by(Product.life_time)
+
     if tag:
-        query = query.where(Product.tag_name.in_(tag))
+        query = query.where(Product.tag_name == tag)
 
     result = await db.execute(query)
     return result.scalars().all()

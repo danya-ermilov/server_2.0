@@ -13,5 +13,6 @@ class UserStat(Base):
     skill_mind = Column(Integer, default=0)
     skill_social = Column(Integer, default=0)
     skill_sport = Column(Integer, default=0)
+    skill_game = Column(Integer, default=0)
 
     user = relationship("User", back_populates="stats")
