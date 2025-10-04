@@ -3,7 +3,7 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
-
+from typing import Union
 from app.auth.hashing import get_password_hash
 from app.models.user import User as modelUser
 from app.models.xp_history import XpHistory as modelXpHistory
@@ -13,8 +13,11 @@ from app.crud import products as crud_product
 from app.models.user import User
 
 
-async def get_user(db: AsyncSession, username: str) -> modelUser | None:
-    result = await db.execute(select(modelUser).where(modelUser.username == username))
+async def get_user(db: AsyncSession, username: Union[str, int]) -> modelUser | None:
+    if isinstance(username, int):
+        result = await db.execute(select(modelUser).where(modelUser.id == username))
+    else:
+        result = await db.execute(select(modelUser).where(modelUser.username == username))
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -32,14 +35,15 @@ async def get_user_with_xp(db: AsyncSession, username: str):
             us.total_xp,
             us.skill_mind,
             us.skill_social,
-            us.skill_sport
+            us.skill_sport,
+            us.skill_game
         FROM users AS u
         LEFT JOIN user_stats AS us ON u.id = us.user_id
         LEFT JOIN xp_history AS h ON u.id = h.user_id
         WHERE u.username = :username
         GROUP BY
             u.id, u.username, h.product_id,
-            us.total_xp, us.skill_mind, us.skill_social, us.skill_sport
+            us.total_xp, us.skill_mind, us.skill_social, us.skill_sport, us.skill_game
         ORDER BY h.product_id;
     """
     )
@@ -55,6 +59,7 @@ async def get_user_with_xp(db: AsyncSession, username: str):
             "skill_mind": r.skill_mind,
             "skill_social": r.skill_social,
             "skill_sport": r.skill_sport,
+            "skill_game": r.skill_game,
         }
     ]
 
@@ -75,7 +80,10 @@ async def get_user_with_xp(db: AsyncSession, username: str):
 
 async def create_user(db: AsyncSession, username: str, password: str) -> modelUser:
     hashed_pw = get_password_hash(password)
-    new_user = modelUser(username=username, password_hash=hashed_pw)
+    new_user = modelUser(
+        username=str(username),
+        password_hash=hashed_pw
+    )
     db.add(new_user)
     try:
         await db.commit()

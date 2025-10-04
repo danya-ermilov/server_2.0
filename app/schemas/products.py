@@ -9,6 +9,8 @@ class ProductBase(BaseModel):
     tag_name: str
     xp: int
     life_time: datetime
+    min_xp_to_enter: Optional[int] = 0
+    type_min_xp_to_enter: Optional[str] = "total_xp"
 
 
 class ProductCreate(ProductBase):
@@ -21,6 +23,8 @@ class ProductUpdate(BaseModel):
     tag_name: Optional[str] = None
     xp: Optional[int] = None
     life_time: Optional[datetime] = None
+    min_xp_to_enter: Optional[datetime] = None
+    type_min_xp_to_enter: Optional[str] = None
 
 
 class ProductOut(ProductBase):

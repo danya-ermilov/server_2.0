@@ -15,6 +15,8 @@ class Product(Base):
     cart_count = Column(Integer, default=0)
     xp = Column(Integer, nullable=False)
     life_time = Column(DateTime, nullable=False)
+    min_xp_to_enter = Column(Integer, default=0)
+    type_min_xp_to_enter = Column(String, default="total_xp")
 
     search_vector = Column(TSVECTOR)
 

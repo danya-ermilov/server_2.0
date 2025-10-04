@@ -58,9 +58,9 @@ async def get_product(
     current_user: User = Depends(get_current_user),
 ):
     product = await crud_product.get_product(db, product_id)
-    if not product or product.owner_id != current_user.id:
+    if product.owner_id != current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="is not your product"
         )
     return product
 

@@ -11,6 +11,7 @@ class UserStatBase(BaseModel):
     skill_mind: int = 0
     skill_social: int = 0
     skill_sport: int = 0
+    skill_game: int = 0
 
 
 class UserStat(UserStatBase):
@@ -25,13 +26,13 @@ class UserStat(UserStatBase):
 # История начислений XP
 # -------------------------
 class XpHistoryBase(BaseModel):
-    category: str  # mind, social, sport, total
+    category: str
     points: int
-    product_id: int  # если связано с мероприятием
+    product_id: int
 
 
 class XpHistoryCreate(XpHistoryBase):
-    user_id: int  # нужно при создании записи
+    user_id: int
 
 
 class XpHistory(XpHistoryBase):
