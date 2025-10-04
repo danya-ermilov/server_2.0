@@ -11,6 +11,11 @@ connections: dict[int, set[WebSocket]] = {}
 
 @router.websocket("/ws/comments/{product_id}")
 async def comments_ws(websocket: WebSocket, product_id: int):
+    """
+    input: websocket : WebSocket, product_id : int
+    do: get ws chat
+    output: None
+    """
     await websocket.accept()
     connections.setdefault(product_id, set()).add(websocket)
 

@@ -14,6 +14,11 @@ router = APIRouter(prefix="/cart", tags=["Cart"])
 async def get_cart(
     current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
+    """
+    input: None
+    do: get cart
+    output: {"cart": cart_data, "cached": False}
+    """
     user_id = current_user.id
     cached_cart = await get_cache().get_cached_cart(user_id)
     if cached_cart:
@@ -38,6 +43,11 @@ async def add_to_cart(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: item_id : int
+    do: add event to cart
+    output: {"status": "added"}
+    """
     user_id = current_user.id
     product = await crud_product.get_product(db, item_id)
     if not product:
@@ -56,6 +66,11 @@ async def clear_cart(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: None
+    do: delete all from cart
+    output: {"status": "cleared"}
+    """
     user_id = current_user.id
     await crud_cart.clear_cart_items(db, user_id)
     await get_cache().clear_cache(user_id)
@@ -68,6 +83,11 @@ async def delete_from_cart(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: item_id : int
+    do: delete event from cart
+    output: {"status": "deleted"}
+    """
     user_id = current_user.id
     product = await crud_product.get_product(db, item_id)
     if not product:

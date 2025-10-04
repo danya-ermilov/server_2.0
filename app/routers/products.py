@@ -18,6 +18,11 @@ async def create_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    input: ProductCreate : Pydantic model
+    do: create event
+    output: Product
+    """
     res = await crud_product.create_product(db, product_in, current_user.id)
     if not res:
         raise HTTPException(
@@ -31,6 +36,11 @@ async def create_product(
 async def get_my_products(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
+    """
+    input: None
+    do: get mt events
+    output: list[Product]
+    """
     return await crud_product.get_products_by_user(db, current_user.id)
 
 
@@ -40,6 +50,11 @@ async def list_all_products(
     db: AsyncSession = Depends(get_db),
     sort_by: str = Query("life_time", enum=["life_time", "total_xp"])
 ):
+    """
+    input: tag from ["skill_mind", "skill_sport", "skill_social", "skill_game"] : str
+    do: get events
+    output: list[Product]
+    """
     return await crud_product.get_all_products(db, tag, sort_by)
 
 
@@ -48,6 +63,11 @@ async def search_products(
     q: str = Query(..., min_length=2, description="Search by product name/description"),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: query to search : str
+    do: get events
+    output: list[Product]
+    """
     return await crud_product.search_products(db, q)
 
 
@@ -57,6 +77,11 @@ async def get_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    input: product_id : int
+    do: get event
+    output: Product
+    """
     product = await crud_product.get_product(db, product_id)
     if product.owner_id != current_user.id:
         raise HTTPException(
@@ -72,6 +97,11 @@ async def update_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    input: product_id : int, ProductUpdate : Pydantic model
+    do: update event
+    output: Product
+    """
     product = await crud_product.update_product(
         db, product_id, product_in, current_user
     )
@@ -89,6 +119,11 @@ async def delete_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    input: product_id : int
+    do: delete event
+    output: {"message": f"Product-{product_id} deleted successfully"}
+    """
     deleted = await crud_product.delete_product(db, product_id, current_user)
     if not deleted:
         raise HTTPException(
@@ -103,5 +138,10 @@ async def get_users(
     product_id: int,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: product_id : int
+    do: get users that have product_id in cart
+    output: users
+    """
     product = await crud_product.get_users_by_product(db, product_id)
     return product

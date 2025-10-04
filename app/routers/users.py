@@ -22,6 +22,11 @@ router = APIRouter()
 
 @router.post("/register")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    """
+    input: UserCreate <- Pydantic model
+    do: register
+    output: {"message": "User registered successfully"}
+    """
     try:
         await crud_user.create_user(db, user.username, user.password)
         return {"message": "User registered successfully"}
@@ -33,6 +38,11 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
+    """
+    input: None
+    do: login
+    output: {"access_token": token, "token_type": "bearer"}
+    """
     user = await crud_user.get_user(db, form_data.username)
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -45,23 +55,43 @@ async def login(
 
 @router.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """
+    input: None
+    do: get my info
+    output: User <- Pydantic model
+    """
     return current_user
 
 
 @router.get("/users/getall", response_model=List[UserInDB])
 async def get_all_users(db: AsyncSession = Depends(get_db)):
+    """
+    input: None
+    do: get all users
+    output: list[User] <- Pydantic model
+    """
     result = await db.execute(select(modelUser))
     return result.scalars().all()
 
 
 @router.get("/users/getone/{username}", response_model=UserInDB)
 async def get_one_user(username: str, db: AsyncSession = Depends(get_db)):
+    """
+    input: username : str
+    do: get one user
+    output: User <- Pydantic model
+    """
     user = await crud_user.get_user(db, username)
     return user
 
 
 @router.get("/users/getone/{username}/xp")
 async def get_one_user_with_xp(username: str, db: AsyncSession = Depends(get_db)):
+    """
+    input: username : str
+    do: get full one user
+    output: User <- Pydantic model
+    """
     user = await crud_user.get_user_with_xp(db, username)
     return user
 
@@ -71,6 +101,11 @@ async def delete_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
+    """
+    input: None
+    do: delete user
+    output: {"message": "User deleted"}
+    """
     await crud_user.delete_user(db, current_user.username)
     return {"message": "User deleted"}
 
@@ -81,6 +116,11 @@ async def update_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
+    """
+    input: UserUpdate : Pydantic modek
+    do: update user
+    output: User
+    """
     return await crud_user.update_user(db, current_user.username, payload)
 
 
@@ -91,6 +131,11 @@ async def set_xp_bulk(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    input: usernames : str, product_id : int
+    do: set xp to user
+    output: {"message": "XP начислены", "results": results}
+    """
     results = []
 
     usernames_list: List[str] = [

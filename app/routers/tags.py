@@ -10,4 +10,9 @@ router = APIRouter(prefix="/tags", tags=["Tags"])
 
 @router.get("/get")
 async def get_tags(db: AsyncSession = Depends(get_db)):
+    """
+    input: None
+    do: get tags
+    output: tags
+    """
     return await crud_tag.get_tags(db)

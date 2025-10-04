@@ -14,6 +14,11 @@ router = APIRouter(prefix="/admin", tags=["Admin_panel"])
     "/users/delete/{username}", dependencies=[Depends(get_current_active_admin_user)]
 )
 async def delete_user(username: str, db: AsyncSession = Depends(get_db)):
+    """
+    input: username
+    do: remove user from db
+    output: {"message": f"{username} deleted"}
+    """
     await crud_user.delete_user(db, username)
     return {"message": f"{username} deleted"}
 
@@ -24,9 +29,19 @@ async def delete_user(username: str, db: AsyncSession = Depends(get_db)):
 async def update_user(
     payload: UserUpdate, username: str, db: AsyncSession = Depends(get_db)
 ):
+    """
+    input: payload : UserUpdate <- Pydantic model, username : str
+    do: update  user from db
+    output: user
+    """
     return await crud_user.update_user(db, username, payload)
 
 
 @router.post("/tags/create", dependencies=[Depends(get_current_active_admin_user)])
 async def create_tag(name: str, db: AsyncSession = Depends(get_db)):
+    """
+    input: name : str
+    do: create tag
+    output: tag
+    """
     return await crud_tag.add_tag(db, name)

@@ -4,6 +4,7 @@ from app.routers import admins, carts, products, users, comments, comments_ws, t
 from app.db.redis import init_redis
 from fastapi.staticfiles import StaticFiles
 from app.core.cache import init_cache
+from fastapi.routing import APIRoute
 
 app = FastAPI()
 
@@ -32,3 +33,12 @@ app.include_router(tags.router)
 @app.get("/")
 async def root():
     return {"message": "Hello Bigger Applications!"}
+
+# Вывод детальной информации о ручках
+for route in app.routes:
+    if isinstance(route, APIRoute):
+        print("PATH:", route.path)
+        print("METHODS:", route.methods)
+        print("NAME:", route.name)
+        print("DOC:", route.endpoint.__doc__)
+        print("-" * 30)

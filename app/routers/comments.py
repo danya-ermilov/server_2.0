@@ -18,6 +18,11 @@ async def create_comment(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    input: product_id : int, text : str
+    do: write comment to event
+    output: dict
+    """
     comment = await crud_comment.add_comment(db, product_id, current_user.id, text)
     redis: Redis = await get_redis()
     payload = {
@@ -34,4 +39,9 @@ async def create_comment(
 
 @router.get("/products/{product_id}/comments")
 async def get_comments(product_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    input: product_id : int
+    do: get comments
+    output: list[comment]
+    """
     return await crud_comment.get_comments(db, product_id)
