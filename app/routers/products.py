@@ -94,3 +94,12 @@ async def delete_product(
             detail="Product not found or not yours",
         )
     return {"message": f"Product-{product_id} deleted successfully"}
+
+
+@router.get("/users/{product_id}")
+async def get_users(
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    product = await crud_product.get_users_by_product(db, product_id)
+    return product

@@ -7,6 +7,7 @@ from app.schemas.products import ProductCreate, ProductUpdate
 from app.crud import tags as crud_tag
 from app.models.user import User
 from typing import Optional, List
+from app.models.cart import CartItem
 
 
 async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: int):
@@ -88,4 +89,9 @@ async def search_products(db: AsyncSession, query: str):
         Product.search_vector.op("@@")(func.plainto_tsquery("simple", query))
     )
     result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+async def get_users_by_product(db: AsyncSession, product_id: int):
+    result = await db.execute(select(CartItem).filter(CartItem.product_id == product_id))
     return result.scalars().all()
