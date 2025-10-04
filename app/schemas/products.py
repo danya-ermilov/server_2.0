@@ -1,5 +1,5 @@
 from typing import Optional
-
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -8,6 +8,7 @@ class ProductBase(BaseModel):
     description: Optional[str] = None
     tag_name: str
     xp: int
+    life_time: datetime
 
 
 class ProductCreate(ProductBase):
@@ -19,6 +20,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     tag_name: Optional[str] = None
     xp: Optional[int] = None
+    life_time: Optional[datetime] = None
 
 
 class ProductOut(ProductBase):

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from app.db.database import Base
 from sqlalchemy.orm import relationship
@@ -14,6 +14,7 @@ class Product(Base):
     tag_name = Column(String, ForeignKey("tags.name", ondelete="CASCADE"))
     cart_count = Column(Integer, default=0)
     xp = Column(Integer, nullable=False)
+    life_time = Column(DateTime, nullable=False)
 
     search_vector = Column(TSVECTOR)
 

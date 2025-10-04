@@ -8,6 +8,7 @@ from app.crud import tags as crud_tag
 from app.models.user import User
 from typing import Optional, List
 from app.models.cart import CartItem
+from datetime import datetime, timedelta
 
 
 async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: int):
@@ -24,7 +25,7 @@ async def create_product(db: AsyncSession, product_in: ProductCreate, user_id: i
 
 
 async def get_all_products(db: AsyncSession, tag: Optional[List[str]]):
-    query = select(Product)
+    query = select(Product).where(Product.life_time > (datetime.utcnow() + timedelta(hours=3))) # Только для МСК
 
     if tag:
         query = query.where(Product.tag_name.in_(tag))
